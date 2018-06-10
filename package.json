@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/jesikaAz/Tchat/issues"
   },
-  "homepage": "https://github.com/jesikaAz/Tchat#readme"
+  "homepage": "https://github.com/jesikaAz/Tchat#readme",
+  "dependencies": {
+    "socket.io": "^2.1.1"
+  }
 }
