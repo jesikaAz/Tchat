@@ -17,5 +17,9 @@ io.sockets.on('connection', function (socket) {
     console.log('Un visiteur est connecté !');
 });
 
+// Send a message to the visitor
+io.sockets.on('connection', function (socket) {
+    socket.emit('message', 'Vous êtes bien connecté !');
+});
 
 server.listen(8080);
