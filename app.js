@@ -20,6 +20,12 @@ io.sockets.on('connection', function (socket) {
 // Send a message to the visitor
 io.sockets.on('connection', function (socket) {
     socket.emit('message', 'Vous êtes bien connecté !');
+
+    // Message Test   
+    socket.on('message', function (message) {
+        console.log('Le visiteur dit : ' + message);
+    });	
 });
+
 
 server.listen(8080);
