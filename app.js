@@ -1,31 +1,29 @@
-var http = require('http');
-var fs = require('fs');
+var app = require('express')(),
+    server = require('http').createServer(app),
+    io = require('socket.io').listen(server),
+    ent = require('ent'), // security
+    fs = require('fs');
 
-// Loading the index.html file displayed to the client
-var server = http.createServer(function(req, res) {
-    fs.readFile('./index.html', 'utf-8', function(error, content) {
-        res.writeHead(200, {"Content-Type": "text/html"});
-        res.end(content);
-    });
-});
-
-// Loading socket.io
-var io = require('socket.io').listen(server);
-
-// Console log 
-io.sockets.on('connection', function (socket) {
-    console.log('Un visiteur est connecté !');
-});
+// index.html 
+app.get('/', function (req, res) {
+    res.sendfile(__dirname + '/index.html');
+  });
 
 // Send a message to the visitor
-io.sockets.on('connection', function (socket) {
-    socket.emit('message', 'Vous êtes bien connecté !');
+io.sockets.on('connection', function (socket,pseudo) {
+    
+     // Pseudo 
+     socket.on('newvisitor', function(pseudo) {
+        pseudo = ent.encode(pseudo);
+        socket.pseudo = pseudo;
+        socket.broadcast.emit('newvisitor', pseudo);
+    });
 
-    // Message Test   
+    // Send message   
     socket.on('message', function (message) {
-        console.log('Le visiteur dit : ' + message);
-    });	
+        message = ent.encode(message);
+        socket.broadcast.emit('message',{pseudo: socket.pseudo, message: message});
+    });
 });
-
 
 server.listen(8080);

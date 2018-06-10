@@ -7,19 +7,55 @@
  
     <body>
         <h1>Un tchat avec socket.io !</h1>
-        <p><input type="button" value="test" id="poke" /> </p>
+
+        <form action="/" method="post" id="form_tchat">
+            <input type="text" name="message" id="message" placeholder="Votre message..." size="50" autofocus />
+            <input type="submit" id="envoi_message" value="Envoyer" />
+        </form>
+
+        <section id="zone_tchat">
+            
+        </section>
+
 
         <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
+
         <script>
             var socket = io.connect('http://localhost:8080');
-            socket.on('message', function(message) {
-                alert('Le serveur a un message pour vous : ' + message);
+
+            var pseudo = prompt('Quel est votre pseudo ?');
+            socket.emit('newvisitor',pseudo);
+            document.title = pseudo + ' - ' + document.title;
+
+
+            socket.on('message', function(data) {
+                insereMessage(data.pseudo,data.message)
             })
 
-            $('#poke').click(function () {
-                socket.emit('message', 'Envoi du test !');
+            socket.on('newvisitor', function(pseudo) {
+                $('#zone_tchat').prepend('<p><em>' + pseudo + ' a rejoint le Tchat !</em></p>');
             })
+
+           $('#form_tchat').submit(function () {
+                var message = $('#message').val();//Send the message to others
+                socket.emit('message', message); //Display the message also on our page
+                insereMessage(pseudo, message); 
+                $('#message').val('').focus(); //Empty the chat area
+                return false; 
+            });
+
+            function insereMessage(pseudo, message) {
+                $('#zone_tchat').prepend('<p><strong>' + pseudo + '</strong> ' + message + '</p>');
+            }
         </script>
+
+    <style>
+        #zone_tchat strong {
+            color: white;
+            background-color: black;
+            padding: 2px;
+        }
+    </style>
     </body>
 </html>
